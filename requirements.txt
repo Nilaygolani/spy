@@ -1,4 +1,4 @@
 # requirements.txt
 mss==10.2.0
-pillow==10.2.0
+pillow==10.4.0
 # (add any other non‑GUI dependencies you still need)
