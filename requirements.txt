@@ -1,3 +1,4 @@
-mss==9.1.0
+# requirements.txt
+mss==10.2.0
 pillow==10.2.0
-# (add any other non‑GUI packages you still need)
+# (add any other non‑GUI dependencies you still need)
