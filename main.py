@@ -1,60 +1,76 @@
 import os
-
-# --- Render & Virtual Screen Setup (इसे सबसे ऊपर रखना ज़रूरी है) ---
-# Xlib की एरर रोकने के लिए होम डायरेक्टरी बदलना
-os.environ['HOME'] = '/tmp'
-
-try:
-    from xvfbwrapper import Xvfb
-    # वर्चुअल डिस्प्ले शुरू करना
-    vdisplay = Xvfb(width=1280, height=725)
-    vdisplay.start()
-    # 'mss' और बाकी टूल्स को वर्चुअल डिस्प्ले का पता बताना
-    os.environ['DISPLAY'] = vdisplay.new_display
-    print(f"[+] Virtual display started on {os.environ['DISPLAY']}")
-except Exception as e:
-    print(f"[-] Could not start Xvfb (running locally?): {e}")
-
-# --- बाकी इम्पोर्ट्स ---
 import time
 import datetime
-from mss import MSS  # पुराने mss (small letters) की जगह कैपिटल MSS का इस्तेमाल
+from mss import mss
 from PIL import Image
+from flask import Flask, jsonify
 
-# --- Screenshot helper -------------------------------------------------------
-def take_screenshot(save_dir: str = "screenshots") -> str:
+app = Flask(__name__)
+
+# Folder create karo agar nahi hai toh
+SCREENSHOT_DIR = "screenshots"
+if not os.path.exists(SCREENSHOT_DIR):
+    os.makedirs(SCREENSHOT_DIR)
+
+def take_screenshot():
     """
-    Capture the entire primary monitor and save as PNG.
-    Returns the full path to the saved file.
+    Screen capture karke file mein save karta hai.
+    Returns the filename.
     """
-    os.makedirs(save_dir, exist_ok=True)
-    
-    # Python 3.14 के लिए utcnow() की जगह नया सही तरीका
-    timestamp = datetime.datetime.now(datetime.UTC).strftime("%Y%m%d_%H%M%S")
-    file_path = os.path.join(save_dir, f"screenshot_{timestamp}.png")
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"{timestamp}.png"
+    filepath = os.path.join(SCREENSHOT_DIR, filename)
 
-    # नए तरीके से Capital MSS() का इस्तेमाल किया
-    with MSS() as sct:
-        # Grab the primary monitor
-        monitor = sct.monitors[1]          # 1 = primary monitor
-        sct_img = sct.grab(monitor)
-        img = Image.frombytes("RGB", sct_img.size, sct_img.rgb)
-        img.save(file_path)
-
-    print(f"[+] Screenshot saved: {file_path}")
-    return file_path
-
-# --- Main loop ---------------------------------------------------------------
-if __name__ == "__main__":
-    # Example: take one screenshot every 10 seconds
     try:
-        while True:
-            take_screenshot()
-            time.sleep(10)
-    except KeyboardInterrupt:
-        print("\n[!] Stopped by user.")
-    finally:
-        # स्क्रिप्ट बंद होने पर वर्चुअल डिस्प्ले को भी साफ-सफाई से बंद करना
-        if 'vdisplay' in locals():
-            vdisplay.stop()
-            print("[+] Virtual display stopped.")
+        with mss() as sct:
+            # Primary monitor grab karo (monitor 1 usually primary hota hai)
+            monitor = sct.monitors[1]
+            sct_img = sct.grab(monitor)
+            
+            # Convert to RGB for PIL
+            img = Image.frombytes("RGB", sct_img.size, sct_img.rgb)
+            
+            # Save file
+            img.save(filepath)
+            print(f"[+] Screenshot saved: {filepath}")
+            return filepath
+    except Exception as e:
+        print(f"[-] Error taking screenshot: {e}")
+        return None
+
+@app.route('/')
+def home():
+    return "Server is running! Screenshotting automatically..."
+
+@app.route('/capture', methods=['GET'])
+def capture_endpoint():
+    """
+    Yeh endpoint manually trigger karne ke liye hai.
+    Browser ya phone se /capture pe jao toh screenshot lega.
+    """
+    file_path = take_screenshot()
+    if file_path:
+        return jsonify({"status": "success", "file": file_path})
+    else:
+        return jsonify({"status": "error"})
+
+def auto_capture_loop():
+    """
+    Yeh function background mein chalta rahega aur har 5 second mein screenshot lega.
+    """
+    print("[*] Starting automatic capture loop...")
+    while True:
+        take_screenshot()
+        time.sleep(5)  # Har 5 second mein naya screenshot
+
+if __name__ == "__main__":
+    import threading
+    
+    # Background thread start karo jo har 5 sec me screenshot lega
+    t = threading.Thread(target=auto_capture_loop)
+    t.daemon = True  # Jab main process band hoga, yeh bhi band ho jayega
+    t.start()
+
+    # Flask server start karo taaki tum manually bhi trigger kar sako
+    # port 10000 use kar rahe hain Render ke liye compatible
+    app.run(host='0.0.0.0', port=10000)
