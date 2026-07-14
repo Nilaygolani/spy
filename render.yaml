@@ -1,8 +1,10 @@
 services:
   - type: worker
-    name: spyware-worker
+    name: spyware-client
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: python main.py
-    plan: free # ya paid plan
+    # If you need headless screenshots:
+    # startCommand: apt-get update && apt-get install -y xvfb && Xvfb :0 -screen 0 1280x720x24 & python main.py
+    plan: free
     region: oregon
