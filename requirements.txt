@@ -1,3 +1,4 @@
 pyautogui==0.9.54
 keyboard==0.13.5
+xvfbwrapper==0.2.9
 # pillow  # optional – automatically pulled by pyautogui
