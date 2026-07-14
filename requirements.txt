@@ -2,3 +2,6 @@ mss==10.2.0
 pillow==10.4.0
 flask==3.0.0
 requests
+
+xvfbwrapper
+telethon
