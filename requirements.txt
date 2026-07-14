@@ -1,5 +1,4 @@
 pyautogui
 keyboard
-threading
 flask
 gunicorn
