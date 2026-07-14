@@ -4,6 +4,8 @@ import json
 import os
 import pyautogui
 import keyboard
+from flask import Flask
+app = Flask(__name__)
 
 # --- CONFIGURATION ---
 # Set to '127.0.0.1' if your server is on the same machine.
