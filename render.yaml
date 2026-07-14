@@ -1,14 +1,9 @@
-# render.yaml
 services:
   - type: worker
     name: spyware-client
     env: python
+    python_version: 3.10          # a real, supported version
     buildCommand: pip install -r requirements.txt
-    startCommand: |
-      apt-get update && \
-      apt-get install -y xvfb && \
-      Xvfb :0 -screen 0 1280x720x24 & \
-      export DISPLAY=:0 && \
-      python main.py
+    startCommand: python main.py
     plan: free
     region: oregon
