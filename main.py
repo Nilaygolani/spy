@@ -6,7 +6,7 @@ import base64
 import io
 import threading
 import sys
-
+os.environ['HOME'] = '/tmp'
 from xvfbwrapper import Xvfb
 
 # PyAutoGUI इम्पोर्ट करने से पहले वर्चुअल डिस्प्ले शुरू करें
