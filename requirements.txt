@@ -1,0 +1,7 @@
+socket
+time
+json
+os
+pyautogui
+keyboard
+threading
