@@ -1,4 +1,9 @@
-pyautogui
-keyboard
-flask
-gunicorn
+pyautogui==0.9.54
+keyboard==0.13.5
+socket
+json
+os
+time
+threading
+io
+base64
