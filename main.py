@@ -7,6 +7,12 @@ import io
 import threading
 import sys
 
+from xvfbwrapper import Xvfb
+
+# PyAutoGUI इम्पोर्ट करने से पहले वर्चुअल डिस्प्ले शुरू करें
+vdisplay = Xvfb(width=1280, height=725)
+vdisplay.start()
+
 # Try importing necessary libraries
 try:
     import pyautogui
