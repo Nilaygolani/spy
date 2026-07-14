@@ -7,6 +7,28 @@ from flask import Flask, jsonify
 
 app = Flask(__name__)
 
+
+@app.route('/view-ss')
+def list_screenshots():
+    # यह स्क्रीनशॉट फोल्डर की सभी फाइलों की लिस्ट दिखाएगा
+    if not os.path.exists("screenshots"):
+        return "अभी तक कोई स्क्रीनशॉट नहीं लिया गया है।"
+    
+    files = os.listdir("screenshots")
+    files = [f for f in files if f.endswith('.png')]
+    files.sort(reverse=True) # नए स्क्रीनशॉट सबसे ऊपर
+    
+    html = "<h1>Screenshots List</h1><ul>"
+    for f in files:
+        html += f'<li><a href="/screenshots/{f}" target="_blank">{f}</a></li>'
+    html += "</ul>"
+    return html
+
+@app.route('/screenshots/<filename>')
+def serve_screenshot(filename):
+    # यह किसी भी स्क्रीनशॉट पर क्लिक करने पर उसे स्क्रीन पर दिखाएगा
+    return send_from_directory("screenshots", filename)
+    
 # Folder create karo agar nahi hai toh
 SCREENSHOT_DIR = "screenshots"
 if not os.path.exists(SCREENSHOT_DIR):
